@@ -1,0 +1,29 @@
+---
+title: react performance optimization techniques
+date: "2024-01-10"
+summary: practical tips for improving react app performance and user experience
+---
+
+## measure before you optimize
+
+Every performance pass should start with a profile, not an instinct. React DevTools' profiler and the browser's performance tab will tell you where time is actually going — usually somewhere unexpected, like a context provider re-rendering half the tree on every keystroke.
+
+## the re-render is the enemy
+
+Most React performance problems trace back to one thing: components re-rendering when their output wouldn't have changed. `memo`, `useMemo`, and `useCallback` all exist to short-circuit that, but they're not free — wrapping everything in them adds overhead and complexity without necessarily helping. They earn their keep on components that are expensive to render or that sit high in the tree.
+
+## state colocation
+
+The fastest re-render is one that never happens. Pushing state down to the smallest component that needs it, instead of lifting everything to a shared parent, naturally limits how much of the tree has to update when that state changes.
+
+## virtualize long lists
+
+Rendering a thousand DOM nodes for a thousand-row list is rarely necessary. Windowing libraries render only what's visible, which turns an O(n) render cost into a constant one — the difference is stark on lower-end devices.
+
+## code splitting and the initial load
+
+Performance isn't just about interactions — time to interactive matters just as much. Route-based code splitting, lazy-loading below-the-fold components, and deferring non-critical scripts all shrink the bundle the browser has to parse before the app is usable.
+
+## the last mile
+
+After the structural fixes, the remaining gains are usually in the details: debouncing expensive handlers, avoiding layout thrash from synchronous DOM reads, and trusting the profiler over assumptions about what's "obviously" slow.

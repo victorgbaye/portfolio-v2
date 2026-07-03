@@ -1,0 +1,27 @@
+---
+title: building scalable web applications
+date: "2024-03-15"
+summary: lessons learned from scaling a web app to handle millions of users
+---
+
+## the problem with early architecture
+
+Most web apps start simple: a monolith, a single database, a handful of routes. That's the right call early on — you're optimizing for speed of iteration, not scale. The trouble starts when that architecture keeps its shape long after the traffic assumptions that justified it have stopped being true.
+
+## reads vs writes
+
+The first real lever is separating read and write paths. Reads are usually where the volume is, and they tolerate staleness far better than writes do. Caching aggressively on the read path — and being honest about which reads can be eventually consistent — buys you most of the headroom you need before touching anything structural.
+
+## horizontal scaling isn't free
+
+Adding more instances behind a load balancer sounds simple until you have to reckon with shared state: sessions, in-memory caches, background jobs assuming single-node execution. Every one of those has to become externalized — Redis for sessions, a real queue for jobs — before horizontal scaling actually works instead of just spreading the same bugs across more machines.
+
+<ScalingDiagram />
+
+## the database is usually the bottleneck
+
+Connection pool exhaustion, N+1 queries, missing indexes — in practice these show up long before the app tier struggles. Instrumenting query latency early, and treating slow queries as bugs rather than acceptable noise, prevents most of the fire drills.
+
+## what actually mattered
+
+In hindsight, the biggest wins weren't clever — they were disciplined: caching what could be cached, queuing what could be deferred, and measuring before optimizing. Scale is rarely one big rewrite; it's a series of small, boring fixes applied consistently.

@@ -1,0 +1,33 @@
+---
+title: typescript best practices for large codebases
+date: "2024-02-20"
+summary: how to structure typescript projects for maintainability and type safety
+---
+
+## types are documentation that can't lie
+
+The main value of TypeScript in a large codebase isn't catching typos — it's that a well-typed function signature tells you what a piece of code expects and returns without having to read the implementation. That only holds if types stay honest, which means resisting the urge to reach for `any` the moment something gets awkward.
+
+## prefer narrow types over defensive code
+
+A function that accepts a union of specific string literals instead of `string` moves a whole category of bugs from runtime to compile time. The same goes for discriminated unions over optional fields — instead of five nullable properties that may or may not agree with each other, one type that makes the invalid states unrepresentable.
+
+```ts
+type RequestState<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error"; error: string }
+```
+
+## structuring for scale
+
+At a certain size, folder structure starts to matter more than any individual type. Colocating types with the modules that own them, rather than centralizing everything in a `types.ts` grab bag, keeps the blast radius of a change contained and makes it obvious where a type's source of truth lives.
+
+## the `any` escape hatch
+
+`any` isn't evil, but it's contagious — one `any` at a boundary tends to spread quietly through everything downstream. `unknown` plus a narrowing check is almost always the better default when the shape of something genuinely isn't known yet.
+
+## tooling pays for itself
+
+Strict mode, `noUncheckedIndexedAccess`, and CI type-checking aren't friction — they're the mechanism that keeps a large codebase's types trustworthy over time, instead of slowly rotting into decoration.
