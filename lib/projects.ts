@@ -7,6 +7,13 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    slug: "altship",
+    name: "altship",
+    url: "https://altship.io",
+    description:
+      "developer platform that turns any openapi spec into a production-ready mcp server. it validates the spec, designs agent-friendly tools, generates and tests the server, then deploys it to a hosted endpoint with logs and metrics.",
+  },
+  {
     slug: "safeclone",
     name: "safeclone",
     url: "https://safeclone.dev",
